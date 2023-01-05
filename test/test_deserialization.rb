@@ -372,4 +372,8 @@ class DeserializationTest < Test::Unit::TestCase
       </hostBusAdapter>
     EOS
   end
+
+  def test_content_library
+    check '<entity type="ContentLibrary">clib-123</entity>', 'clib-123', 'ContentLibrary'
+  end
 end
