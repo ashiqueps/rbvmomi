@@ -372,4 +372,9 @@ class DeserializationTest < Test::Unit::TestCase
       </hostBusAdapter>
     EOS
   end
+
+  def test_content_library
+    obj = VIM::ContentLibrary(nil, 'clib-123')
+    check '<entity type="ContentLibrary">clib-123</entity>', obj, 'ContentLibrary'
+  end
 end

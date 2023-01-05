@@ -85,6 +85,8 @@ module RbVmomi
           node.content
         when :managed
           leaf_managed node, klass
+        when :opaque
+          leaf_opaque node, klass
         else raise
         end
       end
@@ -125,6 +127,10 @@ module RbVmomi
     def leaf_managed node, klass
       type_attr = node['type']
       klass = @loader.get(type_attr) if type_attr
+      klass.new(@conn, node.content)
+    end
+
+    def leaf_opaque node, klass
       klass.new(@conn, node.content)
     end
 

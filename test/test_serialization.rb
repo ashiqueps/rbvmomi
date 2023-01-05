@@ -312,4 +312,11 @@ class SerializationTest < Test::Unit::TestCase
       </root>
     EOS
   end
+
+  def test_content_library
+    obj = VIM::ContentLibrary(nil, 'clib-123')
+    check <<~EOS, obj, 'ContentLibrary', false
+      <root type="ContentLibrary">clib-123</root>
+    EOS
+  end
 end

@@ -8,7 +8,7 @@ require 'set'
 module RbVmomi
   module BasicTypes
 
-    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue)
+    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue OpaqueObject)
 
     class Base
       class << self
@@ -183,9 +183,7 @@ module RbVmomi
       init
     end
 
-    class ManagedObject < ObjectWithMethods
-      def self.kind; :managed end
-
+    module ObjectWithRefAndConnection
       def initialize connection, ref
         super()
         @connection = connection
@@ -200,6 +198,36 @@ module RbVmomi
       def _ref
         @ref
       end
+
+      def to_s
+        "#{self.class.wsdl_name}(#{@ref.inspect})"
+      end
+
+      def to_hash
+        to_s
+      end
+
+      def pretty_print pp
+        pp.text to_s
+      end
+
+      def == x
+        out = (x.class == self.class && x._ref == @ref)
+        out = (x._connection.instanceUuid == self._connection.instanceUuid) if out && x._connection.host
+        out
+      end
+
+      alias eql? ==
+
+      def hash
+        [self.class, @ref].hash
+      end
+    end
+
+    class ManagedObject < ObjectWithMethods
+      include ObjectWithRefAndConnection
+
+      def self.kind; :managed end
 
       def _get_property sym
         ret = @connection.propertyCollector.RetrieveProperties(specSet: [{
@@ -229,32 +257,8 @@ module RbVmomi
         @connection.call method, desc, self, o
       end
 
-      def to_s
-        "#{self.class.wsdl_name}(#{@ref.inspect})"
-      end
-
-      def to_hash
-        to_s
-      end
-
-      def pretty_print pp
-        pp.text to_s
-      end
-
       def [] k
         _get_property k
-      end
-
-      def == x
-        out = (x.class == self.class && x._ref == @ref)
-        out = (x._connection.instanceUuid == self._connection.instanceUuid) if out && x._connection.host
-        out
-      end
-
-      alias eql? ==
-
-      def hash
-        [self.class, @ref].hash
       end
 
       init 'ManagedObject'
@@ -402,6 +406,12 @@ module RbVmomi
       end
     end
 
+    class OpaqueObject < Base
+      include ObjectWithRefAndConnection
 
+      def self.kind; :opaque end
+
+      init 'OpaqueObject'
+    end
   end
 end

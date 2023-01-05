@@ -136,7 +136,7 @@ module RbVmomi
             obj2xml xml, name, expected.wsdl_name, false, e, attrs
           end
         end
-      when BasicTypes::ManagedObject
+      when BasicTypes::ManagedObject, BasicTypes::OpaqueObject
         raise "expected #{expected.wsdl_name} for '#{name}', got #{o.class.wsdl_name} for field #{name.inspect}" if expected and not expected >= o.class and not expected == BasicTypes::AnyType
 
         xml.tag! name, o._ref, type: o.class.wsdl_name
