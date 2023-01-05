@@ -8,7 +8,7 @@ require 'set'
 module RbVmomi
   module BasicTypes
 
-    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue)
+    BUILTIN = Set.new %w(ManagedObject DataObject TypeName PropertyPath ManagedObjectReference MethodName MethodFault LocalizedMethodFault KeyValue OpaqueObject)
 
     class Base
       class << self
@@ -402,6 +402,48 @@ module RbVmomi
       end
     end
 
+    class OpaqueObject < Base
+      def self.kind; :opaque end
 
+      def initialize connection, ref
+        super()
+        @connection = connection
+        @ref = ref
+      end
+
+      def _connection
+        @connection
+      end
+
+      def _ref
+        @ref
+      end
+
+      def to_s
+        "#{self.class.wsdl_name}(#{@ref.inspect})"
+      end
+
+      def to_hash
+        to_s
+      end
+
+      def pretty_print pp
+        pp.text to_s
+      end
+
+      def == x
+        out = (x.class == self.class && x._ref == @ref)
+        out = (x._connection.instanceUuid == self._connection.instanceUuid) if out && x._connection.host
+        out
+      end
+
+      alias eql? ==
+
+      def hash
+        [self.class, @ref].hash
+      end
+
+      init 'OpaqueObject'
+    end
   end
 end

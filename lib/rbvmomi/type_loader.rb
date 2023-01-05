@@ -106,6 +106,7 @@ module RbVmomi
       when 'data' then make_data_type name, desc
       when 'managed' then make_managed_type name, desc
       when 'enum' then make_enum_type name, desc
+      when 'opaque' then make_opaque_type name, desc
       else raise desc.inspect
       end
     end
@@ -129,6 +130,13 @@ module RbVmomi
     def make_enum_type name, desc
       Class.new(BasicTypes::Enum).tap do |klass|
         klass.init name, desc['values']
+        klass.wsdl_name = desc['wsdl_name']
+      end
+    end
+
+    def make_opaque_type name, desc
+      Class.new(BasicTypes::OpaqueObject).tap do |klass|
+        klass.init name
         klass.wsdl_name = desc['wsdl_name']
       end
     end
