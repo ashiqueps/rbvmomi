@@ -374,6 +374,7 @@ class DeserializationTest < Test::Unit::TestCase
   end
 
   def test_content_library
-    check '<entity type="ContentLibrary">clib-123</entity>', 'clib-123', 'ContentLibrary'
+    obj = VIM::ContentLibrary(nil, 'clib-123')
+    check '<entity type="ContentLibrary">clib-123</entity>', obj, 'ContentLibrary'
   end
 end
