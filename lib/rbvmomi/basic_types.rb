@@ -133,8 +133,7 @@ module RbVmomi
       def == o
         return false unless o.class == self.class
 
-        keys = (props.keys + o.props.keys).uniq
-        keys.all? { |k| props[k] == o.props[k] }
+        hash == o.hash
       end
 
       alias eql? ==
@@ -212,7 +211,7 @@ module RbVmomi
       end
 
       def == x
-        out = (x.class == self.class && x._ref == @ref)
+        out = x.hash == hash
         out = (x._connection.instanceUuid == self._connection.instanceUuid) if out && x._connection.host
         out
       end
