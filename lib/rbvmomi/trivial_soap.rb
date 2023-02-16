@@ -90,7 +90,11 @@ class RbVmomi::TrivialSoap
       @sso.request_token unless @sso.assertion_id
       body = @sso.sign_request(body)
     end
-
+    puts "###################################################################################"
+    puts "URL: #{@http.address + @opts[:path]}"
+    puts "Headers: #{headers}"
+    puts "Request body: #{body}"
+    puts "_________________________________________________________________________________"
     start_time = Time.now
     response = @lock.synchronize do
       begin
@@ -107,6 +111,8 @@ class RbVmomi::TrivialSoap
     self.cookie = response['set-cookie'] if response.key? 'set-cookie'
 
     nk = Nokogiri(response.body)
+    puts "Response: #{nk.to_s}"
+    puts "###################################################################################"
 
     RbVmomi.logger.debug("Response (in #{'%.3f' % (end_time - start_time)} s)\n#{nk}") if @debug
 
